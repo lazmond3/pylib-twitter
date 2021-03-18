@@ -32,8 +32,7 @@ def get_auth(url: str, basic: str):
     with open("dump.json", "w") as f:
         f.write(r.text)
 
-if __name__ == '__main__':
-    print(make_basic("hello", "world"))
+def get_auth2():
     if not all([
         CONSUMER_KEY, CONSUMER_SECRET
     ]):
@@ -44,5 +43,6 @@ if __name__ == '__main__':
     print(basic)
     url = "https://api.twitter.com/oauth2/token"
     get_auth(url, basic)
-    # basic
-    
+
+if __name__ == '__main__':
+    pass    
