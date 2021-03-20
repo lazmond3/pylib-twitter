@@ -28,8 +28,8 @@ setup(
     author='lazmond3',
     author_email='moikilo00@gmail.com',
     url='https://github.com/lazmond3/pylib-twitter.git',
-    install_requires=read_requirements(),
+    install_requires=["requests", "lazmond3-pylib-debug"],
     license=license,
     packages=find_packages(exclude=('tests', 'docs')),
-    est_suite='tests'
+    test_suite='tests'
 )

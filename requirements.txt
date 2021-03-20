@@ -1,1 +1,2 @@
 requests
+-e git+https://github.com/lazmond3/pylib-debug.git@master#egg=lazmond3-pylib-debug # public package
