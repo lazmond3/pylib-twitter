@@ -1,11 +1,16 @@
 import os
+import json
 import requests
 from .base64_util import base64_encode_str
+from .TwitterImage import convert_twitter, TwitterImage
 
 CONSUMER_KEY=os.getenv("CONSUMER_KEY")
 CONSUMER_SECRET=os.getenv("CONSUMER_SECRET")
 TOKEN=os.getenv("TOKEN")
 TOKEN_SECRET=os.getenv("TOKEN_SECRET")
+
+# const
+TOKEN_FILENAME="dump.json"
 
 if not all([
     CONSUMER_KEY,
@@ -13,8 +18,6 @@ if not all([
     TOKEN,
     TOKEN_SECRET ]):
     pass
-    # print("Specify all env: CONSUMER_KEY, CONSUMER_SECRET, TOKEN, TOKEN_SECRET")
-    # exit(0)
 
 def make_basic(consumer_key: str, consumer_secret: str) -> str:
     concat = f"{consumer_key}:{consumer_secret}"
@@ -29,10 +32,10 @@ def get_auth(url: str, basic: str):
     print(r)
     print("-------")
     print(r.text)
-    with open("dump.json", "w") as f:
+    with open(TOKEN_FILENAME, "w") as f:
         f.write(r.text)
 
-def get_auth2():
+def get_auth_wrapper():
     if not all([
         CONSUMER_KEY, CONSUMER_SECRET
     ]):
@@ -44,5 +47,54 @@ def get_auth2():
     url = "https://api.twitter.com/oauth2/token"
     get_auth(url, basic)
 
-if __name__ == '__main__':
-    pass    
+def get_one_tweet(tweet_id: str, is_second: bool = False) -> TwitterImage:
+    if not os.path.exists(TOKEN_FILENAME):
+        get_auth_wrapper()
+    with open(TOKEN_FILENAME) as f:
+        s = json.load(f)
+        token = s["access_token"]
+
+    url = "https://api.twitter.com/1.1/statuses/show.json"
+    params = {"id": tweet_id}
+    headers = {"Authorization": f"Bearer {token}"}
+
+    try:
+        r = requests.get(url, params=params, headers=headers)
+    except Exception:
+        if not is_second:
+            os.remove(TOKEN_FILENAME)
+            get_auth_wrapper()
+            # もう一度実行する
+            get_one_tweet(tweet_id, True)
+
+    tx = r.text
+    with open(f"dump_one_{tweet_id}.json", 'w') as f:
+        f.write(tx)
+    tw = convert_twitter(tx)
+    return tw    
+
+# 失敗。
+# def get_oauth1():
+#     url = "https://api.twitter.com/oauth/request_token"
+#     headers = {
+#         # "Authorization":
+#         # f"OAuth oauth_nonce=\"K7ny27JTpKVsTgdyLdDfmQQWVLERj2zAK5BslRsqyw\", oauth_callback=\"http%3A%2F%2Fmyapp.com%3A3005%2Ftwitter%2Fprocess_callback\", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1300228849", oauth_consumer_key="OqEqJeafRSF11jBMStrZz", oauth_signature=\"Pc%2BMLdv028fxCErFyi8KXFM%2BddU%3D\", oauth_version=\"1.0\""
+#     }
+#     payload = {"oauth_callback": "oob"}
+#     r = requests.post(url, params=payload)
+
+#     print(r)
+#     print("-------")
+#     print(r.text)
+#     with open("dump_oauth1.json", "w") as f:
+#         f.write(r.text)
+
+
+# if __name__ == '__main__':
+    # get_oauth1()
+    # get_auth_wrapper()
+    # get_one_tweet("1372519422380797955", "AAAAAAAAAAAAAAAAAAAAAOAsvwAAAAAAWi4Y1e1OyYVS5LKNDt1DipSgtiw%3DpDoe1KFdeNAxgvYmh1rNdhTChKXpHCYC9Xi7HhkOvCAxczxZ0D")
+    # with open("dump_one.json") as f:
+    #     js = json.load(f)
+    # image = convert_twitter(js)
+    # print(image)
