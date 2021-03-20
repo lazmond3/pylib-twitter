@@ -48,51 +48,37 @@ def get_auth_wrapper() -> None:
     get_auth(url, basic)
 
 def get_one_tweet(tweet_id: str, is_second: bool = False) -> TwitterImage:
-    # if not os.path.exists(TOKEN_FILENAME):
-    #     get_auth_wrapper()
-    # with open(TOKEN_FILENAME) as f:
-    #     s = json.load(f)
-    #     token = s["access_token"]
+    if not os.path.exists(TOKEN_FILENAME):
+        get_auth_wrapper()
+    with open(TOKEN_FILENAME) as f:
+        s = json.load(f)
+        token = s["access_token"]
 
-    # url = "https://api.twitter.com/1.1/statuses/show.json"
-    # params = {"id": tweet_id}
-    # headers = {"Authorization": f"Bearer {token}"}
+    url = "https://api.twitter.com/1.1/statuses/show.json"
+    params = {"id": tweet_id}
+    headers = {"Authorization": f"Bearer {token}"}
 
-    # try:
-    #     r = requests.get(url, params=params, headers=headers)
-    # except Exception:
-    #     if not is_second:
-    #         os.remove(TOKEN_FILENAME)
-    #         get_auth_wrapper()
-    #         # もう一度実行する
-    #         get_one_tweet(tweet_id, True)
+    try:
+        r = requests.get(url, params=params, headers=headers)
+    except Exception:
+        if not is_second:
+            os.remove(TOKEN_FILENAME)
+            get_auth_wrapper()
+            # もう一度実行する
+            get_one_tweet(tweet_id, True)
 
-    # tx = r.text
-    # with open(f"dump_one_{tweet_id}.json", 'w') as f:
-    #     f.write(tx)
+    tx = r.text
+    with open(f"dump_one_{tweet_id}.json", 'w') as f:
+        f.write(tx)
+        js = json.loads(tx)
 
-    with open(f"dump_one_{tweet_id}.json", 'r') as f:
-        js = json.load(f)
+    # キャッシュを利用する.
+    # with open(f"dump_one_{tweet_id}.json", 'r') as f:
+        # js = json.load(f)
 
     print(f"tw: {js}")
     tw = convert_twitter(js)
     return tw    
-
-# 失敗。
-# def get_oauth1():
-#     url = "https://api.twitter.com/oauth/request_token"
-#     headers = {
-#         # "Authorization":
-#         # f"OAuth oauth_nonce=\"K7ny27JTpKVsTgdyLdDfmQQWVLERj2zAK5BslRsqyw\", oauth_callback=\"http%3A%2F%2Fmyapp.com%3A3005%2Ftwitter%2Fprocess_callback\", oauth_signature_method="HMAC-SHA1", oauth_timestamp="1300228849", oauth_consumer_key="OqEqJeafRSF11jBMStrZz", oauth_signature=\"Pc%2BMLdv028fxCErFyi8KXFM%2BddU%3D\", oauth_version=\"1.0\""
-#     }
-#     payload = {"oauth_callback": "oob"}
-#     r = requests.post(url, params=payload)
-
-#     print(r)
-#     print("-------")
-#     print(r.text)
-#     with open("dump_oauth1.json", "w") as f:
-#         f.write(r.text)
 
 
 # if __name__ == '__main__':
