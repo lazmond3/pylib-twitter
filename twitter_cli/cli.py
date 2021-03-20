@@ -3,6 +3,7 @@ import json
 import requests
 from .base64_util import base64_encode_str
 from .TwitterImage import convert_twitter, TwitterImage
+from typing import cast
 
 CONSUMER_KEY=os.getenv("CONSUMER_KEY")
 CONSUMER_SECRET=os.getenv("CONSUMER_SECRET")
@@ -22,9 +23,9 @@ if not all([
 def make_basic(consumer_key: str, consumer_secret: str) -> str:
     concat = f"{consumer_key}:{consumer_secret}"
     converted = base64_encode_str(concat)
-    return converted
+    return cast(str, converted)
 
-def get_auth(url: str, basic: str):
+def get_auth(url: str, basic: str) -> None:
     headers = {"Authorization": f"Basic {basic}"}
     payload = {"grant_type": "client_credentials"}
     r = requests.post(url, headers=headers, params=payload)
@@ -35,42 +36,46 @@ def get_auth(url: str, basic: str):
     with open(TOKEN_FILENAME, "w") as f:
         f.write(r.text)
 
-def get_auth_wrapper():
+def get_auth_wrapper() -> None:
     if not all([
         CONSUMER_KEY, CONSUMER_SECRET
     ]):
         print("specify consumer key/secret")
         exit(1)
 
-    basic = make_basic(CONSUMER_KEY, CONSUMER_SECRET)
-    print(basic)
+    basic = cast(str, make_basic(CONSUMER_KEY, CONSUMER_SECRET))
     url = "https://api.twitter.com/oauth2/token"
     get_auth(url, basic)
 
 def get_one_tweet(tweet_id: str, is_second: bool = False) -> TwitterImage:
-    if not os.path.exists(TOKEN_FILENAME):
-        get_auth_wrapper()
-    with open(TOKEN_FILENAME) as f:
-        s = json.load(f)
-        token = s["access_token"]
+    # if not os.path.exists(TOKEN_FILENAME):
+    #     get_auth_wrapper()
+    # with open(TOKEN_FILENAME) as f:
+    #     s = json.load(f)
+    #     token = s["access_token"]
 
-    url = "https://api.twitter.com/1.1/statuses/show.json"
-    params = {"id": tweet_id}
-    headers = {"Authorization": f"Bearer {token}"}
+    # url = "https://api.twitter.com/1.1/statuses/show.json"
+    # params = {"id": tweet_id}
+    # headers = {"Authorization": f"Bearer {token}"}
 
-    try:
-        r = requests.get(url, params=params, headers=headers)
-    except Exception:
-        if not is_second:
-            os.remove(TOKEN_FILENAME)
-            get_auth_wrapper()
-            # もう一度実行する
-            get_one_tweet(tweet_id, True)
+    # try:
+    #     r = requests.get(url, params=params, headers=headers)
+    # except Exception:
+    #     if not is_second:
+    #         os.remove(TOKEN_FILENAME)
+    #         get_auth_wrapper()
+    #         # もう一度実行する
+    #         get_one_tweet(tweet_id, True)
 
-    tx = r.text
-    with open(f"dump_one_{tweet_id}.json", 'w') as f:
-        f.write(tx)
-    tw = convert_twitter(tx)
+    # tx = r.text
+    # with open(f"dump_one_{tweet_id}.json", 'w') as f:
+    #     f.write(tx)
+
+    with open(f"dump_one_{tweet_id}.json", 'r') as f:
+        js = json.load(f)
+
+    print(f"tw: {js}")
+    tw = convert_twitter(js)
     return tw    
 
 # 失敗。
