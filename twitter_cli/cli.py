@@ -47,6 +47,7 @@ def get_auth_wrapper() -> None:
     url = "https://api.twitter.com/oauth2/token"
     get_auth(url, basic)
 
+# この名前だが、画像ツイート情報を取得する。
 def get_one_tweet(tweet_id: str, is_second: bool = False) -> TwitterImage:
     if not os.path.exists(TOKEN_FILENAME):
         get_auth_wrapper()
@@ -68,23 +69,57 @@ def get_one_tweet(tweet_id: str, is_second: bool = False) -> TwitterImage:
             get_one_tweet(tweet_id, True)
 
     tx = r.text
-    with open(f"dump_one_{tweet_id}.json", 'w') as f:
-        f.write(tx)
+    with open(f"dump_one_{tweet_id}.json", 'w', encoding="utf-8") as f:
         js = json.loads(tx)
+        json.dump(js, f, ensure_ascii=False)
 
     # キャッシュを利用する.
     # with open(f"dump_one_{tweet_id}.json", 'r') as f:
         # js = json.load(f)
 
-    print(f"tw: {js}")
     tw = convert_twitter(js)
     return tw    
 
+def get_sumatome(tweet_id: str, is_second: bool = False) -> None:
+    if not os.path.exists(TOKEN_FILENAME):
+        get_auth_wrapper()
+    with open(TOKEN_FILENAME) as f:
+        s = json.load(f)
+        token = s["access_token"]
 
-# if __name__ == '__main__':
+    url = "https://api.twitter.com/1.1/statuses/show.json"
+    params = {"id": tweet_id}
+    headers = {"Authorization": f"Bearer {token}"}
+
+    try:
+        r = requests.get(url, params=params, headers=headers)
+    except Exception:
+        if not is_second:
+            os.remove(TOKEN_FILENAME)
+            get_auth_wrapper()
+            # もう一度実行する
+            get_one_tweet(tweet_id, True)
+
+    tx = r.text
+    with open(f"dump_one_{tweet_id}.json", 'w', encoding="utf-8") as f:
+        # tx = str(tx, encoding='utf-8')
+        js = json.loads(tx)
+        json.dump(js, f, ensure_ascii=False)
+        if js["in_reply_to_status_id_str"] != None:
+            get_one_tweet(js["in_reply_to_status_id_str"])
+
+    # キャッシュを利用する.
+    # with open(f"dump_one_{tweet_id}.json", 'r') as f:
+    #     js = json.load(f)
+
+if __name__ == '__main__':
     # get_oauth1()
     # get_auth_wrapper()
-    # get_one_tweet("1372519422380797955", "AAAAAAAAAAAAAAAAAAAAAOAsvwAAAAAAWi4Y1e1OyYVS5LKNDt1DipSgtiw%3DpDoe1KFdeNAxgvYmh1rNdhTChKXpHCYC9Xi7HhkOvCAxczxZ0D")
+    from sys import argv
+
+    # get_one_tweet("1372519422380797955")
+    get_one_tweet("1373208867836891140")
+    # get_one_tweet("1373208627356442626")
     # with open("dump_one.json") as f:
     #     js = json.load(f)
     # image = convert_twitter(js)
