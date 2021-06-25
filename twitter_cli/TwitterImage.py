@@ -20,8 +20,9 @@ def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
     if "video_info" in dic["extended_entities"]["media"][0]:
         video_info = dic["extended_entities"]["media"][0]["video_info"]
         video_url_inner = video_info["variants"][0]["url"]
+        image_url_inner = dic["extended_entities"]["media"][0]["media_url_https"]
     return TwitterImage(
         id_str = dic["id_str"],
-        image_urls = list(map(lambda x: x["media_url_https"], images)),
+        image_urls = [image_url_inner],
         video_url = video_url_inner
     )
