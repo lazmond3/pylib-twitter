@@ -19,8 +19,15 @@ def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
     video_url_inner = None
     if "video_info" in dic["extended_entities"]["media"][0]:
         video_info = dic["extended_entities"]["media"][0]["video_info"]
-        video_url_inner = video_info["variants"][0]["url"]
+        variants = video_info["variants"]
+        video_mp4_list = list(filter(lambda x: x["content_type"] == "video/mp4", variants))
+        # ビットレート最大を取得
+        video_mp4_list = sorted(video_mp4_list, key=lambda x: -x["bitrate"])
+        # video_url_inner = video_info["variants"][0]["url"]
+
+        video_url_inner = video_mp4_list[0]["url"]
         image_url_inner = dic["extended_entities"]["media"][0]["media_url_https"]
+
     return TwitterImage(
         id_str = dic["id_str"],
         image_urls = [image_url_inner],

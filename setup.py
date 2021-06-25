@@ -22,8 +22,8 @@ def read_requirements():
 
 setup(
     name='lazmond3-pylib-twitter',
-    version='0.0.3',
-    description='twitter cli  0.0.3: video_thum, 0.0.2: video_url',
+    version='0.0.4',
+    description='twitter cli 0.0.4: video thum mp4 bitrate,  0.0.3: video_thum, 0.0.2: video_url',
     long_description=readme,
     author='lazmond3',
     author_email='moikilo00@gmail.com',
