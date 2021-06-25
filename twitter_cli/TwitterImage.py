@@ -6,6 +6,7 @@ from debug import DEBUG
 class TwitterImage:
     id_str: str
     image_urls: List[str]
+    video_url: str
 
 def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
     if DEBUG:
@@ -14,7 +15,13 @@ def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
     images = dic["extended_entities"]["media"]
     if DEBUG:
         print(f"[convert_twitter] images: {images}")
+    
+    video_url_inner = None
+    if "video_info" in dic["extended_entities"]["media"][0]:
+        video_info = dic["extended_entities"]["media"][0]["video_info"]
+        video_url_inner = video_info["variants"][0]["url"]
     return TwitterImage(
         id_str = dic["id_str"],
-        image_urls = list(map(lambda x: x["media_url_https"], images))
+        image_urls = list(map(lambda x: x["media_url_https"], images)),
+        video_url = video_url_inner
     )

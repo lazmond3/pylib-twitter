@@ -118,7 +118,8 @@ if __name__ == '__main__':
     from sys import argv
 
     # get_one_tweet("1372519422380797955")
-    get_one_tweet("1373208867836891140")
+    tw = get_one_tweet("1408228467187933187") # video
+    print(tw)
     # get_one_tweet("1373208627356442626")
     # with open("dump_one.json") as f:
     #     js = json.load(f)
