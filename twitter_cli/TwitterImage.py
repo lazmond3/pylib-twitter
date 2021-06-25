@@ -7,6 +7,10 @@ class TwitterImage:
     id_str: str
     image_urls: List[str]
     video_url: str
+    user_display_name: str
+    user_screen_name: str
+    user_url: str
+    user_profile_url: str
 
 def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
     if DEBUG:
@@ -15,6 +19,11 @@ def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
     images = dic["extended_entities"]["media"]
     if DEBUG:
         print(f"[convert_twitter] images: {images}")
+    user_display_name = dic["user"]["name"]
+    user_screen_name = dic["user"]["screen_name"]
+    user_url = f"https://twitter.com/{user_screen_name}"
+    user_profile_url = dic["user"]["profile_image_url_https"]
+
     
     video_url_inner = None
     if "video_info" in dic["extended_entities"]["media"][0]:
@@ -31,5 +40,10 @@ def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
     return TwitterImage(
         id_str = dic["id_str"],
         image_urls = [image_url_inner],
-        video_url = video_url_inner
+        video_url = video_url_inner,
+        user_display_name = user_display_name,
+        user_screen_name = user_screen_name,
+        user_url = user_url,
+        user_profile_url =  user_profile_url
     )
+
