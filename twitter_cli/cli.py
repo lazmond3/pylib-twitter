@@ -2,7 +2,7 @@ import os
 import json
 import requests
 from .base64_util import base64_encode_str
-from .TwitterImage import convert_twitter, TwitterImage
+from .twitter_image import convert_twitter, TwitterImage
 from typing import cast
 
 CONSUMER_KEY=os.getenv("CONSUMER_KEY")
