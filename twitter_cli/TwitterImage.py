@@ -42,7 +42,8 @@ def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
         image_url_inner = dic["extended_entities"]["media"][0]["media_url_https"]
         image_urls = [image_url_inner]
     else:
-        image_urls = images
+        image_urls = list(map(lambda x: x["media_url_https"], images))
+        print("[debug][image_urls]: ", image_urls)
 
     return TwitterImage(
         id_str = dic["id_str"],

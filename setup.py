@@ -22,7 +22,7 @@ def read_requirements():
 
 setup(
     name='lazmond3-pylib-twitter',
-    version='0.0.9',
+    version='0.1.0',
     description='twitter cli 0.0.7 bugfix image_url_inner 0.0.6: text and rename,  0.0.5: user profile 0.0.4: video thum mp4 bitrate,  0.0.3: video_thum, 0.0.2: video_url',
     long_description=readme,
     author='lazmond3',
