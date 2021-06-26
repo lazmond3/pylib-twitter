@@ -28,6 +28,7 @@ def convert_twitter(dic: Dict[str, Any]) -> TwitterImage:
 
     
     video_url_inner = None
+    image_url_inner = None
     if "video_info" in dic["extended_entities"]["media"][0]:
         video_info = dic["extended_entities"]["media"][0]["video_info"]
         variants = video_info["variants"]
