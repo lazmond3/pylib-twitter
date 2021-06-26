@@ -1,2 +1,2 @@
 from .cli import get_one_tweet
-from .TwitterImage import TwitterImage
+from .twitter_image import TwitterImage
